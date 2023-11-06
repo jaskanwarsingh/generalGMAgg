@@ -1,34 +1,59 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-// Uncomment this line to use console.log
-// import "hardhat/console.sol";
+interface IGMP {
+    function sendMessage(bytes calldata message) external;
+    function receiveMessage(bytes calldata message) external;
+}
 
-contract Lock {
-    uint public unlockTime;
-    address payable public owner;
+contract AIC {
 
-    event Withdrawal(uint amount, uint when);
+    // State variables
+    address owner;
+    IGMP[] public gmpServices;
+    
+    // Events
+    event MessageSent(bytes indexed message, address indexed gmpService);
+    event MessageReceived(bytes indexed message, address indexed gmpService);
 
-    constructor(uint _unlockTime) payable {
-        require(
-            block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
-        );
-
-        unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+    // Modifiers
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
     }
 
-    function withdraw() public {
-        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
-        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
-
-        require(block.timestamp >= unlockTime, "You can't withdraw yet");
-        require(msg.sender == owner, "You aren't the owner");
-
-        emit Withdrawal(address(this).balance, block.timestamp);
-
-        owner.transfer(address(this).balance);
+    constructor() {
+        owner = msg.sender;
     }
+
+    // Function to add a new GMP service
+    function addGMPService(address _gmpService) external onlyOwner {
+        IGMP gmp = IGMP(_gmpService);
+        gmpServices.push(gmp);
+    }
+
+    // Function to send a message via a selected GMP service
+    function sendMessage(bytes calldata message, uint gmpIndex) external {
+        require(gmpIndex < gmpServices.length, "Invalid GMP service index");
+        IGMP gmpService = gmpServices[gmpIndex];
+        gmpService.sendMessage(message);
+        emit MessageSent(message, address(gmpService));
+    }
+
+    // Callback function that the GMP service will call to deliver the message
+    function receiveMessage(bytes calldata message, uint gmpIndex) external {
+        require(gmpIndex < gmpServices.length, "Invalid GMP service index");
+        // Verify that the message is from a registered GMP service
+        IGMP gmpService = gmpServices[gmpIndex];
+        require(msg.sender == address(gmpService), "Invalid GMP service sender");
+
+        // Process the message
+        // ...
+
+        emit MessageReceived(message, msg.sender);
+    }
+
+    // Add more functions related to the contract's logic here
+    // ...
+    
 }
