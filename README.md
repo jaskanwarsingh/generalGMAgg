@@ -32,3 +32,23 @@ A democratic system allowing the dApp community to participate in the governance
 ## Conclusion
 The CCGA provides a customizable and secure framework for dApps to engage in cross-chain activities, from routine transfers to complex operations. It is built with the vision of empowering dApps with the autonomy to define their cross-chain interaction schemes while maintaining high standards of security and reliability.
 
+```mermaid
+graph TD
+    AIC[Aggregator Interface Contract] -->|Registers / Manages| GMPR[GMP Registry Contract]
+    AIC -->|Defines Security Policies| SPC[Security Policy Contract]
+    AIC -->|Manages Queue| MQC[Message Queue Contract]
+    AIC -->|Message Verification| VC[Verification Contract]
+    AIC -->|Handles Specific Actions| AH[Action Handlers]
+    AIC -->|Fallback Mechanism| FHC[Fallback Handler Contract]
+    GMPR -->|Interface for GMPs| GMPIC1[GMP Interface Contract 1]
+    GMPR -->|Interface for GMPs| GMPIC2[GMP Interface Contract 2]
+    GMPR -->|Interface for GMPs| GMPIC3[GMP Interface Contract 3]
+    GOV[Governance Contract] -->|Governs Whole System| AIC
+    GOV -->|Governs GMPs| GMPR
+
+    classDef contract fill:#f9f,stroke:#333,stroke-width:2px;
+    class AIC,GMPR,SPC,MQC,VC,AH,FHC,GMPIC1,GMPIC2,GMPIC3,GOV contract;
+
+```
+
+
