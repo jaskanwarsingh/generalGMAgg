@@ -5,7 +5,7 @@ The Cross-Chain Generalized Aggregator (CCGA) is a smart contract platform desig
 
 ## Components
 
-### Aggregator Contract (AC)
+### Aggregator Interface Contract (AC)
 The core smart contract that interfaces with multiple GMPs. It serves as the primary point of interaction for dApps, routing messages and managing cross-chain communication.
 
 ### GMP Interface Contracts
