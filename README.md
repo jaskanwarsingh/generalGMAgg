@@ -50,5 +50,31 @@ graph TD
     class AIC,GMPR,SPC,MQC,VC,AH,FHC,GMPIC1,GMPIC2,GMPIC3,GOV contract;
 
 ```
+## Case Scenario 
+Below is a case when, a complex action such as liquidation requires confirmations from both GMPs (CCIP and LayerZero in our case)
 
+```mermaid
+sequenceDiagram
+    participant dApp
+    participant AIC as Aggregator Interface Contract
+    participant SPC as Security Policy Contract
+    participant GMPIC_LZ as GMP Interface Contract (LayerZero)
+    participant GMPIC_CCIP as GMP Interface Contract (CCIP)
+    participant RHC as Receiver Handler Contract
+    participant VC as Verification Contract
+    participant AH as Action Handler
+
+    dApp->>AIC: Initiate liquidation
+    AIC->>SPC: Check security policy for liquidation
+    SPC-->>AIC: Requires both GMP confirmations
+    AIC->>GMPIC_LZ: Send message via LayerZero
+    AIC->>GMPIC_CCIP: Send message via CCIP
+    GMPIC_LZ->>RHC: Deliver message to target chain
+    GMPIC_CCIP->>RHC: Deliver message to target chain
+    RHC->>VC: Verify message authenticity
+    VC-->>AIC: All messages verified
+    AIC->>AH: Execute liquidation action
+
+
+```
 
